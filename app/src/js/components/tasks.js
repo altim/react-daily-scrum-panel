@@ -57,40 +57,6 @@ var Tasks = React.createClass({
 
 	},
 
-	onNewItem: function(newItem){
-		app.database().ref('/tasks').push(newItem);
-	},
-
-	deleteItem : function(key){
-		app.database().ref('/tasks').child(key).remove();
-	},
-
-	doneItem: function(key){
-		var doneItems = this.state.items.filter(function( obj ) {
-		    return obj.key === key;
-		});
-
-		var doneItem = doneItems[0],
-			newDoneItem = {};
-		newDoneItem.description = doneItem.description;
-		newDoneItem.status = 'done';
-
-		app.database().ref('/tasks').child(key).update(newDoneItem);
-	},
-
-	undoneItem : function(key){
-		var undoneItems = this.state.doneItems.filter(function( obj ) {
-		    return obj.key === key;
-		});
-
-		var undoneItem = undoneItems[0],
-			newUndoneItem = {};
-
-		newUndoneItem.description = undoneItem.description;
-		newUndoneItem.status = 'todo';
-
-		app.database().ref('/tasks').child(key).update(newUndoneItem);
-	},
 
 	render: function() {
 		return (
