@@ -1,9 +1,7 @@
 /**  @jsx React.DOM **/
 
 var React = require('react'),
-	TaskForm = require('./taskForm'),
-	TaskList = require('./taskList'),
-	DoneTaskList = require('./doneTaskList'),
+	UsersList = require('./usersList'),
 	firebase = require('firebase');
 
 var config = {
@@ -18,27 +16,39 @@ var app = firebase.initializeApp(config);
 
 var Tasks = React.createClass({
 
+	panelUsers : [
+		'atimic',
+		'vdoelle',
+		'smilenkovic',
+		'bbojic',
+		'adammer',
+		'gbulakh',
+		'testuser',
+		'someuser'
+	],
+
 	loadData : function(){
 		app.database().ref('/tasks').on('value',function(snap){
-			var items = [],
-			doneItems = [];
+			var usersTasks = [];
+
+			for(var i=0;i<this.panelUsers.length;i++){
+				usersTasks[this.panelUsers[i]] = {
+					items : [],
+					doneItems : []
+				}
+			}
 
 			snap.forEach(function(itemSnap){
 
 				var item = itemSnap.val();
 				item.key = itemSnap.getKey();
 
-				if(item.status === 'todo'){
-					items.push(item);
-				}
-				else {
-					doneItems.push(item);
-				}
+				usersTasks[item.owner]['items'].push(item);
+
 			});
 
 			this.setState({
-				items : items,
-				doneItems : doneItems
+				usersTasks : usersTasks
 			});
 
 		}.bind(this));
@@ -51,33 +61,18 @@ var Tasks = React.createClass({
 
 	getInitialState : function(){
 		return {
-			items : [],
-			doneItems : []
+			usersTasks : []
 		}
 
 	},
 
 
+
 	render: function() {
+		console.log(this.state.usersTasks);
 		return (
-			<div className="container">
-
-				<div className="row">	
-					<TaskForm onNewItem={this.onNewItem}/>
-				</div>
-
-				<div className="row">
-					
-					<br/><br/>
-					<TaskList items={this.state.items} onDeleteItem={this.deleteItem} onDoneItem={this.doneItem}/>	
-						
-				</div>
-
-				<div className="row">
-					<hr/>
-					<DoneTaskList items={this.state.doneItems} onUndoneItem={this.undoneItem}/>
-				</div>
-
+			<div className="container-fluid">
+				<UsersList usersTasks={this.state.usersTasks} />
 			</div>
 		);
 	}
